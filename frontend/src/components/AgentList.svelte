@@ -118,7 +118,10 @@
   }));
   const workingAgents = $derived(backgroundAgents.filter((agent) => agentStatusGroup(agent) === 'working'));
   const doneAgents = $derived(backgroundAgents.filter((agent) => agentStatusGroup(agent) === 'done'));
-  const mixedLayout = $derived($homeLayout === 'mixed');
+  // Herdr order is the mixed layout with workspaces in the relay's workspace
+  // list order (the desktop sidebar), so cards stay put as agents work.
+  const herdrOrder = $derived($homeLayout === 'herdr');
+  const mixedLayout = $derived($homeLayout === 'mixed' || herdrOrder);
   const doneWorkspaces = $derived(mixedLayout ? [] : workspaceGroupTrees(workspaceGroups(
     doneAgents,
     workspaceRecordsFor(doneAgents, false),
@@ -135,9 +138,19 @@
     idleAgents,
     workspaceRecordsFor(idleAgents, true),
   )));
-  const mixedWorkspaces = $derived(mixedLayout
-    ? workspaceGroupTrees(workspaceGroups(backgroundAgents, workspaceRecordsFor(backgroundAgents, true)))
-    : []);
+  const mixedWorkspaces = $derived.by(() => {
+    if (!mixedLayout) return [];
+    const trees = workspaceGroupTrees(workspaceGroups(backgroundAgents, workspaceRecordsFor(backgroundAgents, true)));
+    if (!herdrOrder) return trees;
+    const relayRank = new Map(allRelays.map((relay, index) => [relay.id, index]));
+    const workspaceRank = new Map(allWorkspaces.map((workspace, index) => [`${workspace.relay_id}\u0000${workspace.workspace_id}`, index]));
+    const rank = (key: string, relayId: string) => [relayRank.get(relayId) ?? Number.MAX_SAFE_INTEGER, workspaceRank.get(key) ?? Number.MAX_SAFE_INTEGER];
+    return [...trees].sort((left, right) => {
+      const [leftRelay, leftWorkspace] = rank(left.workspace.key, left.workspace.relayId);
+      const [rightRelay, rightWorkspace] = rank(right.workspace.key, right.workspace.relayId);
+      return leftRelay - rightRelay || leftWorkspace - rightWorkspace;
+    });
+  });
 
   function workspaceRecordsFor(visible: Agent[], includeEmpty: boolean): RelayWorkspace[] {
     const visibleKeys = new Set(visible.map((agent) => workspaceIdentity(agent)));

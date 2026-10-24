@@ -11,6 +11,8 @@ project follows [Semantic Versioning](https://semver.org/).
   and workspaces. A hidden server shows a count of sessions that need input.
   Visibility is remembered on this device without changing
   connections, notifications, or the selected home layout.
+- Add a **Herdr Order** home layout that keeps workspaces in the same order as
+  the Herdr sidebar instead of moving the most recently active one to the top.
 
 ## [0.22.6] - 2026-10-02
 

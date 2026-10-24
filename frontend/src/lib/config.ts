@@ -51,7 +51,7 @@ export const TERMINAL_HISTORY_OPTIONS = [100, 500, 1_000, 10_000] as const;
 export type TerminalHistoryLines = (typeof TERMINAL_HISTORY_OPTIONS)[number];
 export const TERMINAL_REFRESH_OPTIONS = [100, 250, 500, 1_000] as const;
 export type TerminalRefreshInterval = (typeof TERMINAL_REFRESH_OPTIONS)[number];
-export const HOME_LAYOUTS = ['state', 'mixed'] as const;
+export const HOME_LAYOUTS = ['state', 'mixed', 'herdr'] as const;
 export type HomeLayout = (typeof HOME_LAYOUTS)[number];
 export const AGENT_VIEWS = ['terminal', 'conversation'] as const;
 export type AgentView = (typeof AGENT_VIEWS)[number];
@@ -62,6 +62,7 @@ export const AGENT_VIEW_LABELS: Record<AgentView, string> = {
 export const HOME_LAYOUT_LABELS: Record<HomeLayout, string> = {
   state: 'By State',
   mixed: 'Mixed',
+  herdr: 'Herdr Order',
 };
 export const TERMINAL_REFRESH_LABELS: Record<TerminalRefreshInterval, string> = {
   100: '100 ms',

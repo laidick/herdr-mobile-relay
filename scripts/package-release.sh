@@ -1,6 +1,9 @@
 #!/bin/sh
 # Build complete, manifest-verified release archives for all supported targets.
 set -eu
+# Local deploy branch only: keep macOS tar from adding ._* AppleDouble files,
+# which fail verify-release on Linux hosts.
+export COPYFILE_DISABLE=1
 
 SCRIPT_DIR=${0%/*}
 if [ "$SCRIPT_DIR" = "$0" ]; then

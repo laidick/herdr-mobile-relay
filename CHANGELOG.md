@@ -13,6 +13,8 @@ project follows [Semantic Versioning](https://semver.org/).
   `~/.gemini/skills`, and approval cards for its permission dialog. Approval
   cards appear only once Herdr marks the dialog as blocked; Herdr's agy manifest
   does not yet detect the Antigravity CLI 1.4.7 dialog.
+- Add a **Herdr Order** home layout that keeps workspaces in the same order as
+  the Herdr sidebar instead of moving the most recently active one to the top.
 
 ### Changed
 

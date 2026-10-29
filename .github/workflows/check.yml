@@ -26,13 +26,14 @@ jobs:
       # ai-server's host namespace carries ~20 docker/tailscale interfaces
       # (container green, host flaky). The rest of the suite stays native —
       # in a container it runs as root and PID 1, which breaks other tests
-      # (permission-fail-closed, process-group cancellation).
-      - run: go test $(go list ./... | grep -av '/internal/webrtclink')
+      # (permission-fail-closed, process-group cancellation). The container
+      # runs as the host uid so its test artifacts never turn root-owned.
       - run: |
-          docker run --rm \
+          docker run --rm --user "$(id -u):$(id -g)" \
             -v "$GITHUB_WORKSPACE:/src" \
-            -v "$HOME/.ci-go-mod:/go/pkg/mod" \
-            -v "$HOME/.ci-go-build:/root/.cache/go-build" \
+            -v "$HOME/.ci-go-mod:/cache/mod" \
+            -v "$HOME/.ci-go-build:/cache/build" \
+            -e HOME=/tmp -e GOMODCACHE=/cache/mod -e GOCACHE=/cache/build \
             -w /src -e GOTOOLCHAIN=local \
             golang:1.27 go test ./internal/webrtclink/
 
@@ -71,10 +72,11 @@ jobs:
       # Same webrtclink netns split as the Go quality job above.
       - run: go test -race $(go list ./... | grep -av '/internal/webrtclink')
       - run: |
-          docker run --rm \
+          docker run --rm --user "$(id -u):$(id -g)" \
             -v "$GITHUB_WORKSPACE:/src" \
-            -v "$HOME/.ci-go-mod:/go/pkg/mod" \
-            -v "$HOME/.ci-go-build:/root/.cache/go-build" \
+            -v "$HOME/.ci-go-mod:/cache/mod" \
+            -v "$HOME/.ci-go-build:/cache/build" \
+            -e HOME=/tmp -e GOMODCACHE=/cache/mod -e GOCACHE=/cache/build \
             -w /src -e GOTOOLCHAIN=local \
             golang:1.27 go test -race ./internal/webrtclink/
 

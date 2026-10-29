@@ -115,15 +115,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('frontend/bun.lock') }}
       # --with-deps is omitted: it shells out to sudo apt-get, which the
-      # passwordless-sudo-less self-hosted runner cannot do. The browser
-      # downloads need no privileges; the OS libraries are a one-time host
-      # prerequisite (run `bun x playwright install-deps` with sudo once).
+      # passwordless-sudo-less self-hosted runner cannot do. The Chromium OS
+      # libraries are already present on the host (chromium-mobile passes);
+      # WebKit's are not, so its suite runs in the official container via
+      # HERDR_WEBKIT_CONTAINER below instead of needing a sudo'd install-deps.
       # ./node_modules/.bin (not `bun x`): bun executes bins with its own
       # runtime, whose Node compatibility is 18, below Playwright's floor;
       # the shebang shim goes through `env node` and picks up setup-node.
       - run: cd frontend && ./node_modules/.bin/playwright install chromium webkit
       - run: make frontend-check
       - run: make web-release-check
+        env:
+          HERDR_WEBKIT_CONTAINER: "1"
 
   # Bundles are one of the things this workflow checks, not something it
   # publishes, so they no longer wait behind the test jobs: a red run fails on

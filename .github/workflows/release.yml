@@ -59,7 +59,11 @@ jobs:
         with:
           go-version: 1.27.0
           cache: true
-      - uses: oven-sh/setup-bun@v2
+      - name: Detect host Bun
+        id: host-bun
+        run: if command -v bun >/dev/null 2>&1; then echo present=true >>"$GITHUB_OUTPUT"; else echo present=false >>"$GITHUB_OUTPUT"; fi
+      - if: steps.host-bun.outputs.present != 'true'
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.0
       - run: bun install --frozen-lockfile --cwd frontend

@@ -109,7 +109,11 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('frontend/bun.lock') }}
-      - run: cd frontend && bun x playwright install --with-deps chromium webkit
+      # --with-deps is omitted: it shells out to sudo apt-get, which the
+      # passwordless-sudo-less self-hosted runner cannot do. The browser
+      # downloads need no privileges; the OS libraries are a one-time host
+      # prerequisite (run `bun x playwright install-deps` with sudo once).
+      - run: cd frontend && bun x playwright install chromium webkit
       - run: make frontend-check
       - run: make web-release-check
 

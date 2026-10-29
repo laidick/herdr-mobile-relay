@@ -8,7 +8,7 @@ on:
 jobs:
   go:
     name: Go quality
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, ai-server]
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -25,7 +25,7 @@ jobs:
 
   journal:
     name: Linux journald logging acceptance
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, ai-server]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
@@ -45,7 +45,7 @@ jobs:
   # decided when every later job could start.
   race:
     name: Go race detector
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, ai-server]
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -59,7 +59,7 @@ jobs:
 
   shell:
     name: Shell and production paths
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, ai-server]
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -76,7 +76,7 @@ jobs:
 
   frontend:
     name: Frontend and mobile browsers (Bun 1.4)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, ai-server]
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
@@ -108,7 +108,7 @@ jobs:
   # its own job and a green run stops paying for the serial hop.
   release:
     name: Complete release bundles
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, ai-server]
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -142,7 +142,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: ubuntu-24.04
+          - runner: [self-hosted, linux, x64, ai-server]
             target: linux_amd64
           - runner: ubuntu-24.04-arm
             target: linux_arm64
@@ -170,7 +170,7 @@ jobs:
     name: Mobile harness checks
     # Temporarily disabled while mobile CI is isolated on ci-mobile.
     if: ${{ github.event_name == 'herdr-mobile-check-disabled' }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, ai-server]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7

@@ -12,7 +12,7 @@ permissions:
 jobs:
   verify:
     name: Require successful check workflow
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, ai-server]
     steps:
       - name: Require successful check workflow
         env:
@@ -50,7 +50,7 @@ jobs:
 
   build:
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, ai-server]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -86,7 +86,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: ubuntu-24.04
+          - runner: [self-hosted, linux, x64, ai-server]
             target: linux_amd64
           - runner: ubuntu-24.04-arm
             target: linux_arm64
@@ -131,7 +131,7 @@ jobs:
     # Do not depend on the disabled mobile job: a skipped dependency skips
     # publication too. Restore this dependency when mobile CI is re-enabled.
     needs: [verify, build, native-smoke]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, ai-server]
     permissions:
       actions: read
       contents: write

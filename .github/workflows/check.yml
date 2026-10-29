@@ -29,6 +29,8 @@ jobs:
       # (permission-fail-closed, process-group cancellation). The container
       # runs as the host uid so its test artifacts never turn root-owned.
       - run: |
+          # Docker would auto-create missing mounts root-owned.
+          mkdir -p "$HOME/.ci-go-mod" "$HOME/.ci-go-build"
           docker run --rm --user "$(id -u):$(id -g)" \
             -v "$GITHUB_WORKSPACE:/src" \
             -v "$HOME/.ci-go-mod:/cache/mod" \
@@ -72,6 +74,7 @@ jobs:
       # Same webrtclink netns split as the Go quality job above.
       - run: go test -race $(go list ./... | grep -av '/internal/webrtclink')
       - run: |
+          mkdir -p "$HOME/.ci-go-mod" "$HOME/.ci-go-build"
           docker run --rm --user "$(id -u):$(id -g)" \
             -v "$GITHUB_WORKSPACE:/src" \
             -v "$HOME/.ci-go-mod:/cache/mod" \

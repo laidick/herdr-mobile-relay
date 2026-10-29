@@ -118,7 +118,10 @@ jobs:
       # passwordless-sudo-less self-hosted runner cannot do. The browser
       # downloads need no privileges; the OS libraries are a one-time host
       # prerequisite (run `bun x playwright install-deps` with sudo once).
-      - run: cd frontend && bun x playwright install chromium webkit
+      # ./node_modules/.bin (not `bun x`): bun executes bins with its own
+      # runtime, whose Node compatibility is 18, below Playwright's floor;
+      # the shebang shim goes through `env node` and picks up setup-node.
+      - run: cd frontend && ./node_modules/.bin/playwright install chromium webkit
       - run: make frontend-check
       - run: make web-release-check
 

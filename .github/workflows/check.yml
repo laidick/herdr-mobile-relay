@@ -21,7 +21,20 @@ jobs:
       - name: Format
         run: test -z "$(gofmt -l $(find . -name '*.go' -not -path './frontend/node_modules/*'))"
       - run: go vet ./...
-      - run: go test ./...
+      # go test runs in a clean container network namespace: the webrtclink
+      # WebRTC ICE tests only settle reliably on a hosted-runner-like netns,
+      # and ai-server's host namespace carries ~20 docker/tailscale
+      # interfaces (green 2/2 in a container, flaky on the host). gofmt and
+      # go vet are unaffected and stay native.
+      - run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/src" \
+            -v "$HOME/.ci-go-mod:/go/pkg/mod" \
+            -v "$HOME/.ci-go-build:/root/.cache/go-build" \
+            -w /src -e GOTOOLCHAIN=local \
+            -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory \
+            -e "GIT_CONFIG_VALUE_0=*" \
+            golang:1.27 go test ./...
 
   journal:
     name: Linux journald logging acceptance
@@ -55,7 +68,16 @@ jobs:
         with:
           go-version: 1.27.0
           cache: true
-      - run: go test -race ./...
+      # Same clean-netns rationale as the Go quality job above.
+      - run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/src" \
+            -v "$HOME/.ci-go-mod:/go/pkg/mod" \
+            -v "$HOME/.ci-go-build:/root/.cache/go-build" \
+            -w /src -e GOTOOLCHAIN=local \
+            -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory \
+            -e "GIT_CONFIG_VALUE_0=*" \
+            golang:1.27 go test -race ./...
 
   shell:
     name: Shell and production paths
